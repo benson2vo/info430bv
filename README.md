@@ -3,7 +3,7 @@
 You will build a small, real web app from your own idea, starting from an empty folder, by directing an AI coding assistant. Nothing in this repository is an app: it holds only **places for things** and **the rules your AI follows**, plus the location of the class database. The idea is yours, the code comes from you directing the AI, and you run it, check it, and fix it.
 
 ```
-web/index.html  -->  server/server.js  -->  SQL Server (class server, your <NetID>_myapp database)
+web/index.html  -->  server/server.js  -->  SQL Server (class server, your bv206_3_myapp database)
 the page you see     the middle tier:        the data
                      runs SQL, returns JSON
 ```
