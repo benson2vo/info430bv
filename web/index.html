@@ -217,6 +217,61 @@
       background: var(--green-dark);
     }
 
+    .genre-spotlight {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 0 0 22px;
+      padding: 17px 20px;
+      border: 1px solid #e4e9d8;
+      border-radius: 12px;
+      background: linear-gradient(110deg, #f3f6e9, #fffefa 75%);
+    }
+
+    .spotlight-mark {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--lime);
+      font-size: 1.15rem;
+    }
+
+    .spotlight-copy {
+      flex: 1;
+    }
+
+    .spotlight-label {
+      margin: 0 0 2px;
+      color: var(--green);
+      font-size: 0.67rem;
+      font-weight: 750;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .spotlight-copy h3 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .spotlight-copy p:last-child {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.83rem;
+    }
+
+    .spotlight-count {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 650;
+    }
+
     .table-wrap {
       overflow-x: auto;
       border: 1px solid var(--line);
@@ -322,6 +377,21 @@
         flex-direction: column;
       }
 
+      .genre-spotlight {
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .spotlight-mark {
+        width: 36px;
+        height: 36px;
+      }
+
+      .spotlight-count {
+        display: none;
+      }
+
       .field {
         width: 100%;
       }
@@ -373,6 +443,16 @@
           <button type="submit">Explore genre</button>
         </form>
 
+        <aside class="genre-spotlight" aria-live="polite">
+          <span class="spotlight-mark" aria-hidden="true">♫</span>
+          <div class="spotlight-copy">
+            <p class="spotlight-label">Genre field notes</p>
+            <h3 id="spotlight-title">A little of everything</h3>
+            <p id="spotlight-description">Choose a genre to get a quick introduction before exploring its tracks.</p>
+          </div>
+          <span class="spotlight-count" id="spotlight-count">Loading genres…</span>
+        </aside>
+
         <div class="table-wrap">
           <table>
             <thead>
@@ -406,7 +486,11 @@
     const genrePicker = document.querySelector("#genre");
     const resultBody = document.querySelector("#track-results");
     const resultCount = document.querySelector("#result-count");
+    const spotlightTitle = document.querySelector("#spotlight-title");
+    const spotlightDescription = document.querySelector("#spotlight-description");
+    const spotlightCount = document.querySelector("#spotlight-count");
     const submitButton = form.querySelector("button");
+    let genres = [];
 
     function addCell(row, value, className = "") {
       const cell = document.createElement("td");
@@ -431,10 +515,24 @@
       const response = await fetch("/api/genres");
       if (!response.ok) throw new Error(`Genre request failed (${response.status}).`);
 
-      const genres = await response.json();
+      genres = await response.json();
       const options = [new Option("All genres", "all")];
       genres.forEach((genre) => options.push(new Option(genre.name, genre.name)));
       genrePicker.replaceChildren(...options);
+      spotlightCount.textContent = `${genres.length} styles to explore`;
+      renderSpotlight();
+    }
+
+    function renderSpotlight() {
+      const selectedGenre = genres.find((genre) => genre.name === genrePicker.value);
+      if (selectedGenre) {
+        spotlightTitle.textContent = selectedGenre.name;
+        spotlightDescription.textContent = selectedGenre.description;
+        return;
+      }
+
+      spotlightTitle.textContent = "A little of everything";
+      spotlightDescription.textContent = "Browse every track, or choose one genre for a closer look.";
     }
 
     function formatDuration(seconds) {
@@ -494,6 +592,8 @@
           submitButton.disabled = false;
         });
     });
+
+    genrePicker.addEventListener("change", renderSpotlight);
 
     async function initialize() {
       submitButton.disabled = true;

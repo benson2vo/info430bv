@@ -32,7 +32,7 @@ app.get('/api/genres', async (_req, res) => {
   try {
     const pool = await sql.connect(getDatabaseConfig());
     const result = await pool.request().query(`
-      SELECT GenreID AS id, GenreName AS name
+      SELECT GenreID AS id, GenreName AS name, GenreDescription AS description
       FROM dbo.Genres
       ORDER BY GenreName;
     `);
